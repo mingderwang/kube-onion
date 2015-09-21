@@ -54,7 +54,6 @@ func (s *KubeService) Run(cfg Config) error {
 
 	r.GET("/kube", kubeResource.GetAllKubes)
 	r.GET("/kube/:id", kubeResource.GetKube)
-	r.GET("/kube/:tag", kubeResource.GetKubeByTag)
 	r.POST("/kube", kubeResource.CreateKube)
 	r.PUT("/kube/:id", kubeResource.UpdateKube)
 	r.PATCH("/kube/:id", kubeResource.PatchKube)

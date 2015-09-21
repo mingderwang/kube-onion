@@ -46,11 +46,36 @@ func (tr *KubeResource) GetAllKubes(c *gin.Context) {
 	c.JSON(http.StatusOK, kubes)
 }
 
+func (tr *KubeResource) getTag(c *gin.Context) (string, error) {
+	tagStr := c.Params.ByName("id")
+	fmt.Println(tagStr)
+	return tagStr, nil
+}
+
+func (tr *KubeResource) GetKubeByTag(c *gin.Context) {
+	tag, err := tr.getTag(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "problem in decoding tag"})
+		return
+	}
+	var kube Kube
+	if tr.db.Where("tag = ?", tag).First(&kube).RecordNotFound() {
+		c.JSON(http.StatusNotFound, gin.H{"message": "no found"})
+	} else {
+		c.JSON(http.StatusOK, kube)
+	}
+}
+
 func (tr *KubeResource) GetKube(c *gin.Context) {
 	id, err := tr.getId(c)
 	if err != nil {
+            if id == 0 {
+                tr.GetKubeByTag(c)
+                return
+            } else {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "problem decoding id sent"})
 		return
+            }
 	}
 
 	var kube Kube
