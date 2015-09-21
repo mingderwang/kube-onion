@@ -32,7 +32,6 @@ func (tr *KubeResource) CreateKube(c *gin.Context) {
 	}
 	//kube.Status = KubeStatus
 	kube.Ginger_Created = int32(time.Now().Unix())
-
 	tr.db.Save(&kube)
 
 	c.JSON(http.StatusCreated, kube)
@@ -64,6 +63,33 @@ func (tr *KubeResource) GetKubeByTag(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, kube)
 	}
+}
+
+func (tr *KubeResource) LikeKube(c *gin.Context) {
+	var kube Kube
+	tag, err := tr.getTag(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "problem in decoding tag"})
+		return
+	}
+	if tr.db.Where("tag = ?", tag).First(&kube).RecordNotFound() {
+		c.JSON(http.StatusNotFound, gin.H{"message": "no found"})
+	} else {
+	        kube.Like = 10
+		tr.db.Save(&kube)
+		c.JSON(http.StatusOK, kube)
+	}
+
+}
+
+func (tr *KubeResource) SearchKube(c *gin.Context) {
+	var kubes []Kube
+	keyword, _ := tr.getTag(c)
+	if tr.db.Where("tag LIKE ? or description LIKE ?", "%"+keyword+"%", "%"+keyword+"%").Find(&kubes).Error == gorm.RecordNotFound {
+		c.JSON(400, gin.H{"message": "database find error"})
+		return
+	}
+	c.JSON(200, kubes)
 }
 
 func (tr *KubeResource) GetKube(c *gin.Context) {
