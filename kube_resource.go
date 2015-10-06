@@ -75,7 +75,7 @@ func (tr *KubeResource) LikeKube(c *gin.Context) {
 	if tr.db.Where("tag = ?", tag).First(&kube).RecordNotFound() {
 		c.JSON(http.StatusNotFound, gin.H{"message": "no found"})
 	} else {
-	        kube.Like = 10
+	        kube.Like = kube.Like + 1
 		tr.db.Save(&kube)
 		c.JSON(http.StatusOK, kube)
 	}
