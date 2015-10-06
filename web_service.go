@@ -24,7 +24,7 @@ type KubeService struct {
 }
 
 func (s *KubeService) getDb(cfg Config) (gorm.DB, error) {
-	db, err := gorm.Open("sqlite3", "./"+cfg.DbName)
+	db, err := gorm.Open("sqlite3", cfg.DbName)
 	//db.LogMode(true)
 	return db, err
 }
@@ -40,7 +40,8 @@ func (s *KubeService) Migrate(cfg Config) error {
 	return nil
 }
 func (s *KubeService) Run(cfg Config) error {
-	db, err := s.getDb(cfg)
+	s.Migrate(cfg)
+        db, err := s.getDb(cfg)
 	if err != nil {
 		return err
 	}
